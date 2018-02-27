@@ -83,7 +83,7 @@ public class FeedResource {
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "24") Integer linesPerPage,
             @RequestParam(value = "orderBy", defaultValue = "createdAt") String orderBy,
-            @RequestParam(value = "direction", defaultValue = "ASC") String direction) throws IOException {
+            @RequestParam(value = "direction", defaultValue = "DESC") String direction) throws IOException {
 
         Page<Feed> list = service.readByCriteria(device, page, linesPerPage, orderBy, direction);
         FeedDTO dto = new FeedDTO(deviceService.readById(device), list);
