@@ -13,7 +13,6 @@ import br.com.habeis.api.services.exceptions.DataIntegrityException;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,7 +81,7 @@ public class FeedResource {
             @RequestParam(value = "device", defaultValue = "0", required = true) Integer device,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "24") Integer linesPerPage,
-            @RequestParam(value = "orderBy", defaultValue = "createdAt") String orderBy,
+            @RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
             @RequestParam(value = "direction", defaultValue = "DESC") String direction) throws IOException {
 
         Page<Feed> list = service.readByCriteria(device, page, linesPerPage, orderBy, direction);
