@@ -4,7 +4,7 @@
    
     <groupId>com.dulval.api.habeis</groupId>
     <artifactId>api-habeis</artifactId>
-    <version>4.0</version>
+    <version>7.0</version>
     <packaging>jar</packaging>
     
     <name>DataLogger - Habeis</name>
