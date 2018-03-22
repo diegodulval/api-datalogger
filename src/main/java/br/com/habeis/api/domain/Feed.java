@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 
@@ -25,10 +26,11 @@ public class Feed implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
+    @NotBlank
     private String createdAt;
-
+    @NotBlank
     private String outputs;
+    @NotBlank
     private String sensors;
 
     @JsonIgnore

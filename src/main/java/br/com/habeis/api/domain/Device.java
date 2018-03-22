@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  *
@@ -25,7 +26,9 @@ public class Device implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
 
     @OneToMany(mappedBy = "device")

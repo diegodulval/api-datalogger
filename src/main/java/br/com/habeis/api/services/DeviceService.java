@@ -1,8 +1,11 @@
 package br.com.habeis.api.services;
 
 import br.com.habeis.api.domain.Device;
-import br.com.habeis.api.domain.Feed;
+import br.com.habeis.api.domain.Output;
+import br.com.habeis.api.domain.Sensor;
 import br.com.habeis.api.repositories.DeviceRepository;
+import br.com.habeis.api.repositories.OutputRepository;
+import br.com.habeis.api.repositories.SensorRepository;
 import br.com.habeis.api.services.exceptions.DataIntegrityException;
 import br.com.habeis.api.services.exceptions.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +27,26 @@ public class DeviceService {
     @Autowired
     private DeviceRepository repo;
 
+    @Autowired
+    private OutputRepository outRepo;
+
+    @Autowired
+    private SensorRepository sensorRepo;
+
     public Device create(Device obj) {
         obj.setId(null);
+
         obj = repo.save(obj);
+
+        for (Output out : obj.getOutputs()) {
+            out.setDevice(obj);
+            outRepo.save(out);
+        }
+        for (Sensor sensor : obj.getSensors()) {
+            sensor.setDevice(obj);
+            sensorRepo.save(sensor);
+        }
+
         return obj;
     }
 

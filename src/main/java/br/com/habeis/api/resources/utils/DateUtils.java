@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.TimeInfo;
 
@@ -20,6 +22,9 @@ import org.apache.commons.net.ntp.TimeInfo;
  */
 public class DateUtils {
 
+    public static String DATE = "DATE";
+    public static String TIME = "TIME";
+            
     public static Date parseDate(String date) {
 
         try {
@@ -29,9 +34,7 @@ public class DateUtils {
         }
     }
 
-      public static Date getDate() throws UnknownHostException, IOException {
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    public static Date getDateTime() throws UnknownHostException, IOException {
 
         String ntpServer = "a.st1.ntp.br"; //servidor de horario brasileiro
         NTPUDPClient timeClient = new NTPUDPClient();
@@ -39,21 +42,34 @@ public class DateUtils {
         TimeInfo timeInfo = timeClient.getTime(inetAddress);
         long returnTime = timeInfo.getReturnTime();
         Date time = new Date(returnTime);
-        time.setHours( time.getHours() - 3);
+        time.setHours(time.getHours() - 3);
 
         return time;
     }
-    public static String dateNow() throws UnknownHostException, IOException {
+
+    private static String formatDate(Date dateTime) throws UnknownHostException, IOException {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        return dateFormat.format(getDate());
+        return dateFormat.format(dateTime);
     }
 
-    public static String timeNow() throws IOException {
+    private static String formatTime(Date dateTime) throws IOException {
 
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
-        return timeFormat.format(getDate());
+        return timeFormat.format(dateTime);
+    }
+
+    public static Map<String, String> getMapDataTime() throws IOException {
+        
+        Map<String, String> dateMap = new HashMap<>();        
+        
+        Date date = getDateTime();
+        
+        dateMap.put(DATE,  formatDate(date));
+        dateMap.put(TIME,  formatTime(date));
+        
+        return dateMap;
     }
 }
