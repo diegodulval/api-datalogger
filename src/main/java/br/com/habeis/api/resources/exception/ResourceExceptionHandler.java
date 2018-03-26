@@ -48,6 +48,14 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<StandardError> validation(IllegalArgumentException e, HttpServletRequest request) {
+
+        ValidationError err = new ValidationError(HttpStatus.BAD_REQUEST.value(), "Erro de acesso, confira a URL do serviço.", System.currentTimeMillis());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+    }
+
     @ExceptionHandler(BindException.class)
     public ResponseEntity<StandardError> validation(BindException e, HttpServletRequest request) {
 
@@ -63,6 +71,6 @@ public class ResourceExceptionHandler {
 
         StandardError err = new StandardError(HttpStatus.BAD_REQUEST.value(), e.getMessage(), System.currentTimeMillis());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
-    }        
-            
+    }
+
 }
