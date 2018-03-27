@@ -158,7 +158,7 @@ public class DBService {
         output12.setName("Saida #2");
         //output12.setId(2);
         output12.setStatus(00);
-        output12.setDevice(device);
+        output12.setDevice(device1);
         outputService.create(output12);
 
         Output output13 = new Output();
