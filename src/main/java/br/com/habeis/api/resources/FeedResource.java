@@ -3,23 +3,28 @@ package br.com.habeis.api.resources;
 import br.com.habeis.api.domain.Device;
 import br.com.habeis.api.domain.Feed;
 import br.com.habeis.api.domain.Output;
+import br.com.habeis.api.domain.Sensor;
+import br.com.habeis.api.dto.DeviceDTO;
 import br.com.habeis.api.dto.FeedDTO;
 import br.com.habeis.api.dto.FeedDTONew;
+import br.com.habeis.api.dto.GraphDTO;
+import br.com.habeis.api.dto.SensorDTO;
 import br.com.habeis.api.resources.utils.DateUtils;
 import br.com.habeis.api.resources.utils.URL;
 import br.com.habeis.api.services.DeviceService;
 import br.com.habeis.api.services.FeedService;
 import br.com.habeis.api.services.OutputService;
+import br.com.habeis.api.services.SensorService;
 import br.com.habeis.api.services.exceptions.DataIntegrityException;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +54,9 @@ public class FeedResource {
 
     @Autowired
     private DeviceService deviceService;
+
+    @Autowired
+    private SensorService sensorService;
 
     @Autowired
     private OutputService outputService;
@@ -88,19 +96,45 @@ public class FeedResource {
             @RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
             @RequestParam(value = "direction", defaultValue = "DESC") String direction) throws IOException {
 
-        Page<Feed> list = service.readByCriteria(device, page, linesPerPage, orderBy, direction);
-        
+        Page<Feed> list = service.readByCriteria(device, null, page, linesPerPage, orderBy, direction);
+
         FeedDTO dto = new FeedDTO(deviceService.readById(device), list);
 
         return ResponseEntity.ok().body(dto);
     }
 
-    @GetMapping("/update")
+    @GetMapping("/test")
+    public ResponseEntity readDevice(
+            @RequestParam(value = "device", required = true) Integer deviceId,
+            @RequestParam(value = "sensor", required = false) Integer sensorId,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "linesPerPage", defaultValue = "24") Integer linesPerPage,
+            @RequestParam(value = "orderBy", defaultValue = "id") String orderBy,
+            @RequestParam(value = "direction", defaultValue = "DESC") String direction) throws IOException {
 
+        Device device = deviceService.readById(deviceId);
+        DeviceDTO deviceDto = new DeviceDTO();
+        deviceDto.setId(device.getId());
+        deviceDto.setDescricao(device.getDescription());
+        deviceDto.setNome(device.getName());
+
+        for (Sensor sensor : device.getSensors()) {
+            SensorDTO dto = new SensorDTO();
+            dto.setDescricao(sensor.getDescription());
+            dto.setNome(sensor.getName());
+            dto.setId(sensor.getId());
+            deviceDto.getSensores().add(dto);
+
+            dto.setRegistros(service.readByCriteria(deviceDto.getId(), sensor.getId()));
+        }
+        return ResponseEntity.ok().body(deviceDto);
+    }
+
+    @GetMapping("/update")
     public @ResponseBody
     ResponseEntity read(@Valid @ModelAttribute FeedDTONew model) throws IOException {
 
-        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> resposta = new HashMap<>();
 
         String sensorsDecode = URL.decodeParam(model.getSensors());
         String outputDecode = URL.decodeParam(model.getOutputs());
@@ -115,23 +149,21 @@ public class FeedResource {
         Map<String, String> dateMap = DateUtils.getMapDataTime();
         String actualDate = dateMap.get(DateUtils.DATE);
         String actualTime = dateMap.get(DateUtils.TIME);
-        data.put("date", actualDate);
-        data.put("time", actualTime);
+
+        resposta.put("date", actualDate);
+        resposta.put("time", actualTime);
 
         if ("77/77/7777 77:77:77".equals(receiveDateTime)) {
             persistDate = actualDate + " " + actualTime;
         } else {
-            
             if (!model.getDate()
                     .matches("^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/((19|2[0-9])[0-9]{2})$")) {
                 throw new DataIntegrityException("Informe uma data valída!");
             }
-            
             if (!model.getTime()
                     .matches("^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]")) {
                 throw new DataIntegrityException("Informe uma hora valída!");
             }
-            
             persistDate = receiveDateTime;
         }
 
@@ -139,13 +171,16 @@ public class FeedResource {
 
             Device device = deviceService.readById(model.getDevice());
 
-            Feed feed = new Feed();
-            feed.setDevice(device);
-            feed.setOutputs(outputDecode);
-            feed.setCreatedAt(persistDate);
-            feed.setSensors(sensorsDecode);
-
-            service.create(feed);
+            List<Feed> feedList = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                Feed feed = new Feed();
+                feed.setSensor(device.getSensors().get(i));
+                double resultado = sensorList.get(i);
+                feed.setValue(resultado / 10);
+                feed.setCreatedAt(persistDate);
+                feedList.add(feed);
+            }
+            service.create(feedList);
 
             String outputsReturn = "";
 
@@ -160,17 +195,14 @@ public class FeedResource {
                     .map((actualOutput) -> actualOutput + ",")
                     .reduce(outputsReturn, String::concat);
 
-            data.put("outputs", outputsReturn.substring(0, outputsReturn.length() - 1));
-            data.put("status", "200");
-            data.put("device", String.format("%04d", device.getId()));
+            resposta.put("outputs", outputsReturn.substring(0, outputsReturn.length() - 1));
+            resposta.put("status", "200");
+            resposta.put("device", String.format("%04d", device.getId()));
 
         } else {
             throw new DataIntegrityException("Nao foi enviado a quantidade correta de sensores(10) e de saidas(5).");
         }
 
-        
-        Gson gson = new Gson();
-        String json = gson.toJson(data);
-        return ResponseEntity.ok().body(json);
+        return ResponseEntity.ok().body(resposta);
     }
 }

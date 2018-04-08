@@ -17,8 +17,13 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public final class FeedSpecification {
 
+    public static Specification whereSensor(Integer param) {
+        return (Specification<Feed>) (Root<Feed> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> cb.equal(root.join("sensor").get("id"), param);
+    }
+
     public static Specification whereDevice(Integer param) {
-        return (Specification<Feed>) (Root<Feed> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> cb.equal(root.join("device").get("id"), param);
+        return (Specification<Feed>) (Root<Feed> root, CriteriaQuery<?> query, CriteriaBuilder cb)
+                -> cb.equal(root.join("sensor").join("device").get("id"), param);
     }
 
 }

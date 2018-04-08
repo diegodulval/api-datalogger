@@ -28,15 +28,13 @@ public class Feed implements Serializable {
 
     @NotBlank
     private String createdAt;
-    @NotBlank
-    private String outputs;
-    @NotBlank
-    private String sensors;
-
+    
+    private Double value;
+    
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "device_id")
-    private Device device;
+    @JoinColumn(name = "sensor_id")
+    private Sensor sensor;
 
     public Feed() {
     }

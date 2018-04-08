@@ -36,10 +36,6 @@ public class Device implements Serializable {
 
     @OneToMany(mappedBy = "device")
     private List<Output> outputs = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "device")
-    private List<Feed> feeds = new ArrayList<>();
     
     public Device(){}
 
