@@ -61,12 +61,23 @@ public class DeviceResource {
     }
 
     @PutMapping("/{id}/outputs")
-    public ResponseEntity update(@Valid @RequestBody List<Output> list, @PathVariable Integer id) {
+    public ResponseEntity updateOutputs(@Valid @RequestBody List<Output> list, @PathVariable Integer id) {
 
         for (Output obj : list) {
-            obj.setDevice(service.readById(id));
-            outputService.update(obj);
+            if (obj.getStatus() != 0) {
+                obj.setDevice(service.readById(id));
+                outputService.update(obj);
+            }
         }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/output")
+    public ResponseEntity updateOutput(@Valid @RequestBody Output out, @PathVariable Integer id) {
+
+        out.setDevice(service.readById(id));
+        outputService.update(out);
 
         return ResponseEntity.noContent().build();
     }

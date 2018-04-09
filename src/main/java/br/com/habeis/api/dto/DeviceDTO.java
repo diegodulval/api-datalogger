@@ -5,8 +5,7 @@
  */
 package br.com.habeis.api.dto;
 
-import br.com.habeis.api.domain.Feed;
-import br.com.habeis.api.domain.Sensor;
+import br.com.habeis.api.domain.Output;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,7 @@ public class DeviceDTO implements Serializable {
     private Integer id;
     private String nome;
     private String descricao;
+    private List<Output> saidas = new ArrayList<>();
     private List<SensorDTO> sensores = new ArrayList<>();
 
 }

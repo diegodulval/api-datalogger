@@ -73,7 +73,7 @@ public class FeedService {
 
         Specification where = applyCriteria(deviceId, sensorId);
 
-        PageRequest pageRequest = new PageRequest(0, 10, new Sort(Direction.ASC, "id"));
+        PageRequest pageRequest = new PageRequest(0, 10, new Sort(Direction.DESC, "id"));
 
         List<Feed> listFeed = repo.findAll(where, pageRequest).getContent();
 
