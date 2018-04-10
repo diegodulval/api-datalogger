@@ -2,7 +2,11 @@ package br.com.habeis.api.resources;
 
 import br.com.habeis.api.domain.Device;
 import br.com.habeis.api.domain.Output;
+import br.com.habeis.api.domain.Sensor;
+import br.com.habeis.api.dto.DeviceDTO;
+import br.com.habeis.api.dto.SensorDTO;
 import br.com.habeis.api.services.DeviceService;
+import java.io.IOException;
 import br.com.habeis.api.services.FeedService;
 import br.com.habeis.api.services.OutputService;
 import java.net.URI;
@@ -34,16 +38,10 @@ public class DeviceResource {
     private DeviceService service;
 
     @Autowired
-    private FeedService deviceService;
+    private FeedService feedService;
 
     @Autowired
     private OutputService outputService;
-
-    @GetMapping("/{id}")
-    public ResponseEntity find(@PathVariable Integer id) {
-        Device obj = service.readById(id);
-        return ResponseEntity.ok().body(obj);
-    }
 
     @PostMapping
     public ResponseEntity insert(@Valid @RequestBody Device obj) {
@@ -82,10 +80,33 @@ public class DeviceResource {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}")
+    /* @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }*/
+    
+    @GetMapping("/{id}/feeds")
+    public ResponseEntity readFeeds(@PathVariable Integer id) throws IOException {
+
+        Device device = service.readById(id);
+        DeviceDTO deviceDto = new DeviceDTO();
+        deviceDto.setId(device.getId());
+        deviceDto.setDescricao(device.getDescription());
+        deviceDto.setNome(device.getName());
+
+        deviceDto.setSaidas(outputService.toDTO(device.getOutputs()));
+
+        for (Sensor sensor : device.getSensors()) {
+            SensorDTO dto = new SensorDTO();
+            dto.setDescricao(sensor.getDescription());
+            dto.setNome(sensor.getName());
+            dto.setId(sensor.getId());
+            deviceDto.getSensores().add(dto);
+
+            dto.setRegistros(feedService.readByCriteria(deviceDto.getId(), sensor.getId()));
+        }
+        return ResponseEntity.ok().body(deviceDto);
     }
 
     @GetMapping

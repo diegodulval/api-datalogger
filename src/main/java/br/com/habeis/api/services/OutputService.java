@@ -2,9 +2,12 @@ package br.com.habeis.api.services;
 
 import br.com.habeis.api.domain.Feed;
 import br.com.habeis.api.domain.Output;
+import br.com.habeis.api.dto.OutputDTO;
 import br.com.habeis.api.repositories.OutputRepository;
 import br.com.habeis.api.services.exceptions.DataIntegrityException;
 import br.com.habeis.api.services.exceptions.ObjectNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -87,5 +90,21 @@ public class OutputService {
     private void updateData(Output newObj, Output obj) {
         newObj.setStatus(obj.getStatus());
         //newObj.setDescription(obj.getDescription());
+    }
+
+    public List<OutputDTO> toDTO(List<Output> outputs) {
+
+        List<OutputDTO> list = new ArrayList<>();
+
+        for (Output output : outputs) {
+            OutputDTO dto = new OutputDTO();
+            dto.setDescricao(output.getDescription());
+            dto.setNome(output.getName());
+            dto.setId(output.getId());
+            dto.setValor(output.getStatus());
+            list.add(dto);
+        }
+
+        return list;
     }
 }

@@ -19,7 +19,7 @@ public class DeviceDTO implements Serializable {
     private Integer id;
     private String nome;
     private String descricao;
-    private List<Output> saidas = new ArrayList<>();
+    private List<OutputDTO> saidas = new ArrayList<>();
     private List<SensorDTO> sensores = new ArrayList<>();
 
 }

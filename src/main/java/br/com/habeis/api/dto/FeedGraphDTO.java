@@ -5,11 +5,7 @@
  */
 package br.com.habeis.api.dto;
 
-import br.com.habeis.api.domain.Feed;
-import br.com.habeis.api.domain.Sensor;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Data;
 
 @Data

@@ -1,5 +1,6 @@
-package br.com.habeis.api.domain;
+package br.com.habeis.api.dto;
 
+import br.com.habeis.api.domain.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 
@@ -12,25 +13,17 @@ import javax.persistence.ManyToOne;
 import lombok.Data;
 
 @Data
-@Entity
-public class Output implements Serializable {
+public class OutputDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String name;
-    private String description;
+    private String nome;
+    private String descricao;
     
-    private Integer status;
+    private Integer valor;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "device_id")
-    private Device device;
-
-    public Output() {
+    public OutputDTO() {
     }
 }
